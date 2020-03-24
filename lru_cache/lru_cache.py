@@ -24,10 +24,13 @@ class LRUCache:
     """
 
     def get(self, key):
+        # If key already exists, move to front (most recent) and return the value
         if key in self.storage:
-            new_node = self.storage[key]
-            self.cache.move_to_front(new_node)
-            return new_node.value[1]
+            node = self.storage[key]
+            self.cache.move_to_front(node)
+            return node.value[1]
+
+        # If key doesn't exist, return None
         else:
             return None
 
@@ -43,13 +46,17 @@ class LRUCache:
     """
 
     def set(self, key, value):
+        # If key already exists, replace with incoming value, then move to front (most recent)
         if key in self.storage:
-            new_node = self.storage[key]
-            new_node.value = (key, value)
-            self.cache.move_to_front(new_node)
-            return
+            node = self.storage[key]
+            node.value = (key, value)
+            return self.cache.move_to_front(node)
+
+        # If hitting the max cache limit, delete oldest from the tail
         if self.cache.length == self.limit:
             del self.storage[self.cache.tail.value[0]]
             self.cache.remove_from_tail()
+
+        # Otherwise, add incoming key:value pair to the head (most recent)
         self.cache.add_to_head((key, value))
         self.storage[key] = self.cache.head
