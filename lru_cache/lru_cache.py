@@ -12,8 +12,8 @@ class LRUCache:
 
     def __init__(self, limit=10):
         self.limit = limit
-        self.cache = DoublyLinkedList()
-        self.storage = {}
+        self.cache = {}
+        self.storage = DoublyLinkedList()
 
     """
     Retrieves the value associated with the given key. Also
@@ -25,9 +25,9 @@ class LRUCache:
 
     def get(self, key):
         # If key already exists, move to front (most recent) and return the value
-        if key in self.storage:
-            node = self.storage[key]
-            self.cache.move_to_front(node)
+        if key in self.cache:
+            node = self.cache[key]
+            self.storage.move_to_front(node)
             return node.value[1]
 
         # If key doesn't exist, return None
@@ -47,16 +47,16 @@ class LRUCache:
 
     def set(self, key, value):
         # If key already exists, replace with incoming value, then move to front (most recent)
-        if key in self.storage:
-            node = self.storage[key]
+        if key in self.cache:
+            node = self.cache[key]
             node.value = (key, value)
-            return self.cache.move_to_front(node)
+            return self.storage.move_to_front(node)
 
         # If hitting the max cache limit, delete oldest from the tail
-        if self.cache.length == self.limit:
-            del self.storage[self.cache.tail.value[0]]
-            self.cache.remove_from_tail()
+        if self.storage.length == self.limit:
+            del self.cache[self.storage.tail.value[0]]
+            self.storage.remove_from_tail()
 
         # Otherwise, add incoming key:value pair to the head (most recent)
-        self.cache.add_to_head((key, value))
-        self.storage[key] = self.cache.head
+        self.storage.add_to_head((key, value))
+        self.cache[key] = self.storage.head
