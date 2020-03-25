@@ -12,8 +12,10 @@ class LRUCache:
 
     def __init__(self, limit=10):
         self.limit = limit
-        self.cache = {}
-        self.storage = DoublyLinkedList()
+        # self.cache = {}
+        # self.storage = DoublyLinkedList()
+        self.order = DoublyLinkedList()
+        self.cache = dict()
 
     """
     Retrieves the value associated with the given key. Also
@@ -23,16 +25,23 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
 
-    def get(self, key):
-        # If key already exists, move to front (most recent) and return the value
-        if key in self.cache:
-            node = self.cache[key]
-            self.storage.move_to_front(node)
-            return node.value[1]
+    # def get(self, key):
+    #     # If key already exists, move to front (most recent) and return the value
+    #     if key in self.cache:
+    #         node = self.cache[key]
+    #         self.storage.move_to_front(node)
+    #         return node.value[1]
 
-        # If key doesn't exist, return None
-        else:
+    #     # If key doesn't exist, return None
+    #     else:
+    #         return None
+    def get(self, key):
+        if key not in self.cache:
             return None
+        else:
+            node = self.cache[key]
+            self.order.move_to_front(node)
+            return node.value[1]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -45,18 +54,40 @@ class LRUCache:
     the newly-specified value.
     """
 
+    # def set(self, key, value):
+    #     # If key already exists, replace with incoming value, then move to front (most recent)
+    #     if key in self.cache:
+    #         node = self.cache[key]
+    #         node.value = (key, value)
+    #         return self.storage.move_to_front(node)
+
+    #     # If hitting the max cache limit, delete oldest from the tail
+    #     if self.storage.length == self.limit:
+    #         del self.cache[self.storage.tail.value[0]]
+    #         self.storage.remove_from_tail()
+
+    #     # Otherwise, add incoming key:value pair to the head (most recent)
+    #     self.storage.add_to_head((key, value))
+    #     self.cache[key] = self.storage.head
+
     def set(self, key, value):
-        # If key already exists, replace with incoming value, then move to front (most recent)
+        # if item/key already exists
         if key in self.cache:
+            # overwrite the value
             node = self.cache[key]
+            # assign node value to be key:value tuple
             node.value = (key, value)
-            return self.storage.move_to_front(node)
+            # move to the head (most recently used)
+            self.order.move_to_front(node)
+            return
 
-        # If hitting the max cache limit, delete oldest from the tail
-        if self.storage.length == self.limit:
-            del self.cache[self.storage.tail.value[0]]
-            self.storage.remove_from_tail()
+        # size is at the limit
+        if len(self.order) == self.limit:
+            # evict the oldest from tail in both the cache
+            oldest_index = self.order.tail.value[0]
+            del self.cache[oldest_index]
+            self.order.remove_from_tail()
 
-        # Otherwise, add incoming key:value pair to the head (most recent)
-        self.storage.add_to_head((key, value))
-        self.cache[key] = self.storage.head
+        # size is not at limit for adding new item, add new to the front
+        self.order.add_to_head((key, value))
+        self.cache[key] = self.order.head
