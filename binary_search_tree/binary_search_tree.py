@@ -81,26 +81,58 @@ class BinarySearchTree:
     # in an iterative breadth first traversal
 
     def bft_print(self, node):
+        # create queue
+        # add root to queue
+        # while queue is not empty
+        # node = pop head of queue
+        # DO THE THING!!! (print)
+        # add children of node to queue
         self.queue.enqueue(node)
         while self.queue.size > 0:
-            print(self.queue.dequeue())
-            if node.left:
-                self.queue.enqueue(node.left)
-            if node.right:
-                self.queue.enqueue(node.right)
+            current_node = self.queue.dequeue()
+            print(current_node.value)
+            if current_node.left:
+                self.queue.enqueue(current_node.left)
+            if current_node.right:
+                self.queue.enqueue(current_node.right)
 
     # Print the value of every node, starting with the given node,
     # in an iterative depth first traversal
     def dft_print(self, node):
-        pass
+        self.stack.push(node)
+        while self.stack.size > 0:
+            current_node = self.stack.pop()
+            print(current_node.value)
+            if current_node.left:
+                self.stack.push(current_node.left)
+            if current_node.right:
+                self.stack.push(current_node.right)
 
     # STRETCH Goals -------------------------
     # Note: Research may be required
 
     # Print Pre-order recursive DFT
     def pre_order_dft(self, node):
-        pass
+        # queue up the current node and print
+        self.queue.enqueue(node.value)
+        print(self.queue.dequeue())
+
+        # drill down the left side
+        if node.left:
+            self.left.pre_order_dft(node.left)
+
+        # then dril down the right side
+        if node.right:
+            self.right.pre_order_dft(node.right)
 
     # Print Post-order recursive DFT
     def post_order_dft(self, node):
-        pass
+        # first drill down the left side as far as you can go
+        if node.left:
+            self.left.post_order_dft(node.left)
+
+        # if right leaf, drill down right side too
+        if node.right:
+            self.right.post_order_dft(node.right)
+
+        print(node.value)
